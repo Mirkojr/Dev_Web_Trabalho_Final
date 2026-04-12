@@ -40,7 +40,7 @@ Utilizamos o padrão **Conventional Commits**.
 
 ### 📌 Formato
 
-```
+```txt
 <tipo>(escopo opcional): descrição
 ```
 
@@ -77,7 +77,7 @@ teste
 
 ## 🔀 Pull Requests (PR)
 
-### 📌 Antes de abrir um PR:
+### 📌 Antes de abrir um PR
 
 - Certifique-se de que o código funciona
 - Revise seu próprio código
@@ -85,7 +85,7 @@ teste
 
 ---
 
-### 📌 O PR deve conter:
+### 📌 O PR deve conter
 
 - Descrição clara do que foi feito
 - (Se aplicável) como testar a funcionalidade
