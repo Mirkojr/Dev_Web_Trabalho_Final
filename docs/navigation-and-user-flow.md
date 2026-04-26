@@ -4,7 +4,7 @@
 
 O mapa de navegação e fluxo da aplicação é uma representação visual das principais telas e rotas do sistema, mostrando como os usuários interagem com a aplicação e como as diferentes áreas estão conectadas. Ele serve como um guia para entender a estrutura da aplicação, os caminhos que os usuários podem seguir e as funcionalidades disponíveis em cada etapa da jornada.
 ![Mapa de Navegação e Fluxo da Aplicação](mapa-navegacao.png)
-[Link do Excalidraw](https://excalidraw.com/#json=HOMRd0_HHMhCCjghUJri8,BjqJukITOzAQq0W-xiZtUA)
+[Link do Excalidraw](https://excalidraw.com/#json=SGJ2ywg8EdmPXYAVA5YH1,-YJGRx00Se8qbb2sOuNPRg)
 
 ## Sobre cada tela
 
