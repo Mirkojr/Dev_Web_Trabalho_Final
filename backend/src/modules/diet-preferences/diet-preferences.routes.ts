@@ -3,22 +3,23 @@ import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { adminMiddleware } from "../../middlewares/admin.middleware";
 
-import { AllergensController } from "./allergens.controller";
+import { DietPreferencesController } from "./diet-preferences.controller";
 
 const router = Router();
 
-const controller = new AllergensController();
+const controller =
+  new DietPreferencesController();
 
 /**
  * @openapi
- * /allergens:
+ * /diet-preferences:
  *   get:
  *     tags:
- *       - Allergens
- *     summary: Listar todos os alergênicos
+ *       - Diet Preferences
+ *     summary: Listar todas as preferências alimentares
  *     responses:
  *       200:
- *         description: Lista de alergênicos
+ *         description: Lista de preferências alimentares
  *         content:
  *           application/json:
  *             schema:
@@ -32,19 +33,19 @@ const controller = new AllergensController();
  *                     type: string
  *             example:
  *               - id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
- *                 name: Amendoim
+ *                 name: Vegetariana
  *               - id: 9a2f4c1d-63f0-4d1a-8d66-4a8f7e2b4567
- *                 name: Leite
+ *                 name: Vegana
  */
 router.get("/", controller.findAll);
 
 /**
  * @openapi
- * /allergens/{id}:
+ * /diet-preferences/{id}:
  *   get:
  *     tags:
- *       - Allergens
- *     summary: Buscar alergênico por ID
+ *       - Diet Preferences
+ *     summary: Buscar preferência alimentar por ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -54,7 +55,7 @@ router.get("/", controller.findAll);
  *           format: uuid
  *     responses:
  *       200:
- *         description: Alergênico encontrado
+ *         description: Preferência alimentar encontrada
  *         content:
  *           application/json:
  *             schema:
@@ -66,19 +67,19 @@ router.get("/", controller.findAll);
  *                   type: string
  *             example:
  *               id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
- *               name: Amendoim
+ *               name: Vegana
  *       404:
- *         description: Alergênico não encontrado
+ *         description: Preferência alimentar não encontrada
  */
 router.get("/:id", controller.findById);
 
 /**
  * @openapi
- * /allergens:
+ * /diet-preferences:
  *   post:
  *     tags:
- *       - Allergens
- *     summary: Criar alergênico
+ *       - Diet Preferences
+ *     summary: Criar preferência alimentar
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -94,10 +95,10 @@ router.get("/:id", controller.findById);
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 100
- *                 example: Amendoim
+ *                 example: Vegetariana
  *     responses:
  *       201:
- *         description: Alergênico criado
+ *         description: Preferência alimentar criada
  *         content:
  *           application/json:
  *             schema:
@@ -109,21 +110,26 @@ router.get("/:id", controller.findById);
  *                   type: string
  *             example:
  *               id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
- *               name: Amendoim
+ *               name: Vegetariana
  *       401:
  *         description: Token ausente ou inválido
  *       403:
  *         description: Acesso negado
  */
-router.post("/", authMiddleware, adminMiddleware, controller.create);
+router.post(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  controller.create
+);
 
 /**
  * @openapi
- * /allergens/{id}:
+ * /diet-preferences/{id}:
  *   patch:
  *     tags:
- *       - Allergens
- *     summary: Atualizar alergênico
+ *       - Diet Preferences
+ *     summary: Atualizar preferência alimentar
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -146,10 +152,10 @@ router.post("/", authMiddleware, adminMiddleware, controller.create);
  *                 type: string
  *                 minLength: 2
  *                 maxLength: 100
- *                 example: Amendoim torrado
+ *                 example: Vegetariana estrita
  *     responses:
  *       200:
- *         description: Alergênico atualizado
+ *         description: Preferência alimentar atualizada
  *         content:
  *           application/json:
  *             schema:
@@ -161,13 +167,13 @@ router.post("/", authMiddleware, adminMiddleware, controller.create);
  *                   type: string
  *             example:
  *               id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
- *               name: Amendoim torrado
+ *               name: Vegetariana estrita
  *       401:
  *         description: Token ausente ou inválido
  *       403:
  *         description: Acesso negado
  *       404:
- *         description: Alergênico não encontrado
+ *         description: Preferência alimentar não encontrada
  */
 router.patch(
   "/:id",
@@ -178,11 +184,11 @@ router.patch(
 
 /**
  * @openapi
- * /allergens/{id}:
+ * /diet-preferences/{id}:
  *   delete:
  *     tags:
- *       - Allergens
- *     summary: Remover alergênico
+ *       - Diet Preferences
+ *     summary: Remover preferência alimentar
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -194,13 +200,13 @@ router.patch(
  *           format: uuid
  *     responses:
  *       204:
- *         description: Alergênico removido com sucesso
+ *         description: Preferência alimentar removida com sucesso
  *       401:
  *         description: Token ausente ou inválido
  *       403:
  *         description: Acesso negado
  *       404:
- *         description: Alergênico não encontrado
+ *         description: Preferência alimentar não encontrada
  */
 router.delete(
   "/:id",
