@@ -36,14 +36,22 @@ export class UsersService {
       },
     });
 
-    await prisma.userAllergen.createMany({
-      data: allergenIds.map((allergenId) => ({
-        userId,
-        allergenId,
-      })),
-    });
+    if (allergenIds.length > 0) {
+      await prisma.userAllergen.createMany({
+        data: allergenIds.map(
+          (allergenId) => ({
+            userId,
+            allergenId,
+          })
+        ),
+      });
+    }
 
-    return prisma.user.findUnique({
+    return this.getAllergens(userId);
+  }
+  
+  async getAllergens(userId: string) {
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -55,5 +63,53 @@ export class UsersService {
         },
       },
     });
+    return user?.allergens ?? [];
+  }
+
+  async getDietPreferences(
+    userId: string
+  ) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        dietPreferences: {
+          include: {
+            dietPreference: true,
+          },
+        },
+      },
+    });
+
+    return user?.dietPreferences ?? [];
+  }
+
+  async updateDietPreferences(
+    userId: string,
+    dietPreferenceIds: string[]
+  ) {
+    await prisma.userDietPreference.deleteMany({
+      where: {
+        userId,
+      },
+    });
+
+    if (
+      dietPreferenceIds.length > 0
+    ) {
+      await prisma.userDietPreference.createMany({
+        data: dietPreferenceIds.map(
+          (dietPreferenceId) => ({
+            userId,
+            dietPreferenceId,
+          })
+        ),
+      });
+    }
+
+    return this.getDietPreferences(
+      userId
+    );
   }
 }
