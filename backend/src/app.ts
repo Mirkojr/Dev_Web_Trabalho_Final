@@ -1,17 +1,26 @@
 import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import { errorMiddleware } from "./middlewares/error.middleware";
+
+import routes from "./routes";
+import swaggerRouter from "./swagger";
 
 const app = express();
 
+app.use(helmet());
+app.use(cors());
+
 app.use(express.json());
 
-app.get("/health", (_, res) => {
-  res.status(200).json({
-    status: "ok",
-  });
-});
+app.use(morgan("dev"));
 
-const PORT = process.env.PORT || 3000;
+app.use("/docs", swaggerRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+app.use(routes);
+
+app.use(errorMiddleware);
+
+export default app;
