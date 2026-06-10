@@ -1,9 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum RoleName {
@@ -88,6 +90,11 @@ model Category {
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   recipes RecipeCategory[]
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdById])
 }
 
 model Ingredient {
@@ -100,6 +107,11 @@ model Ingredient {
 
   recipes   RecipeIngredient[]
   allergens IngredientAllergen[]
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdById])
 }
 
 model Allergen {
