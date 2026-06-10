@@ -10,6 +10,7 @@ import {
 
 import {
   createRecipeSchema,
+  recipeIdParamSchema,
 } from "./recipes.schemas";
 
 import {
@@ -47,4 +48,41 @@ export class RecipesController {
       next(error);
     }
   };
+
+  findAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+    ) => {
+    try {
+        const recipes =
+        await this.service.findAll();
+
+        return res.json(recipes);
+    } catch (error) {
+        next(error);
+    }
+    };
+
+    findById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+    ) => {
+    try {
+        const { id } =
+        recipeIdParamSchema.parse(
+            req.params
+        );
+
+        const recipe =
+        await this.service.findById(
+            id
+        );
+
+        return res.json(recipe);
+    } catch (error) {
+        next(error);
+    }
+    };
 }

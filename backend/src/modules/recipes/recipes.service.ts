@@ -121,4 +121,106 @@ export class RecipesService {
       },
     });
   }
+
+  async findAll() {
+    return prisma.recipe.findMany({
+        where: {
+        status: "APPROVED",
+        },
+
+        include: {
+        author: {
+            select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+            },
+        },
+
+        categories: {
+            include: {
+            category: true,
+            },
+        },
+
+        dietPreferences: {
+            include: {
+            dietPreference: true,
+            },
+        },
+
+        ingredients: {
+            include: {
+            ingredient: true,
+            },
+        },
+        },
+
+        orderBy: {
+        createdAt: "desc",
+        },
+    });
+  }
+
+    async findById(id: string) {
+    const recipe =
+        await prisma.recipe.findFirst({
+        where: {
+            id,
+            status: "APPROVED",
+        },
+
+        include: {
+            author: {
+            select: {
+                id: true,
+                username: true,
+                avatarUrl: true,
+            },
+            },
+
+            categories: {
+            include: {
+                category: true,
+            },
+            },
+
+            dietPreferences: {
+            include: {
+                dietPreference: true,
+            },
+            },
+
+            ingredients: {
+            include: {
+                ingredient: true,
+            },
+            },
+
+            comments: {
+            include: {
+                user: {
+                select: {
+                    id: true,
+                    username: true,
+                },
+                },
+            },
+
+            orderBy: {
+                createdAt: "desc",
+            },
+            },
+        },
+        });
+
+    if (!recipe) {
+        throw new HttpError(
+        404,
+        "Recipe not found"
+        );
+    }
+
+    return recipe;
+    }
 }
