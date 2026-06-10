@@ -32,6 +32,20 @@ export class DietPreferencesService {
   }
 
   async create(data: CreateDietPreferenceDto) {
+    const exists =
+      await prisma.dietPreference.findUnique({
+        where: {
+          name: data.name,
+        },
+      });
+
+    if (exists) {
+      throw new HttpError(
+        409,
+        "Diet preference already exists"
+      );
+    }
+
     return prisma.dietPreference.create({
       data,
     });
@@ -42,6 +56,23 @@ export class DietPreferencesService {
     data: UpdateDietPreferenceDto
   ) {
     await this.findById(id);
+
+    if (data.name) {
+      const existing =
+        await prisma.dietPreference.findFirst({
+          where: {
+            name: data.name,
+            NOT: { id },
+          },
+        });
+
+      if (existing) {
+        throw new HttpError(
+          409,
+          "Diet preference already exists"
+        );
+      }
+    }
 
     return prisma.dietPreference.update({
       where: { id },
