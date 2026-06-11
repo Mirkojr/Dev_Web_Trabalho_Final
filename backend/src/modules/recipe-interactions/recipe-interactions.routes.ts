@@ -7,8 +7,8 @@ const controller = new RecipeInteractionsController();
 
 router.use(authMiddleware);
 
-router.post("/", controller.create);
-router.delete("/undo", controller.undo);
-router.get("/", controller.findAll);
+router.post("/swipe", controller.swipe);
+router.get("/feed", controller.feed);
+router.post("/undo", controller.undo);
 
 export default router;

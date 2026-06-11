@@ -1,12 +1,13 @@
 import { z } from "zod";
+import { InteractionType } from "../../generated/prisma";
 
-export const createInteractionSchema = z.object({
-  recipeId: z.string().uuid(),
-  type: z.enum(["SMASH", "PASS"]),
+export const swipeSchema = z.object({
+  recipeId: z.uuid(),
+  type: z.enum(InteractionType),
 });
 
-export const undoInteractionSchema = z.object({
-  interactionId: z.string().uuid(),
+export const interactionIdParamSchema = z.object({
+  id: z.uuid(),
 });
 
-export type CreateInteractionDto = z.infer<typeof createInteractionSchema>;
+export type CreateInteractionDto = z.infer<typeof swipeSchema>;

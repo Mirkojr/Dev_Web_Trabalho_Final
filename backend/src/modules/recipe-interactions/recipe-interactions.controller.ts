@@ -1,20 +1,34 @@
 import { Request, Response, NextFunction } from "express";
 import { RecipeInteractionsService } from "./recipe-interactions.service";
-import { createInteractionSchema } from "./recipe-interactions.schemas";
+import { swipeSchema } from "./recipe-interactions.schemas";
+import { getAuthUser } from "../../utils/get-auth-user";
 
 export class RecipeInteractionsController {
   private service = new RecipeInteractionsService();
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
+  swipe = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = createInteractionSchema.parse(req.body);
+      const user = getAuthUser(req);
 
-      const result = await this.service.create(
-        req.user!.id,
-        data
-      );
+      const { recipeId, type } = swipeSchema.parse(req.body);
 
-      return res.status(201).json(result);
+      const result = await this.service.swipe(user.id, recipeId, type);
+
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  feed = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = getAuthUser(req);
+
+      const limit = Number(req.query.limit ?? 10);
+
+      const feed = await this.service.feed(user.id, limit);
+
+      return res.json(feed);
     } catch (err) {
       next(err);
     }
@@ -22,16 +36,10 @@ export class RecipeInteractionsController {
 
   undo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.undoLast(req.user!.id);
-      return res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  };
+      const user = getAuthUser(req);
 
-  findAll = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const result = await this.service.getUserInteractions(req.user!.id);
+      const result = await this.service.undo(user.id);
+
       return res.json(result);
     } catch (err) {
       next(err);

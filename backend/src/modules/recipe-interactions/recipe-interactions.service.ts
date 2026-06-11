@@ -1,72 +1,98 @@
 import { prisma } from "../../lib/prisma";
 import { HttpError } from "../../utils/http-error";
-import { CreateInteractionDto } from "./recipe-interactions.schemas";
+import { InteractionType } from "../../generated/prisma";
 
 export class RecipeInteractionsService {
-  async create(userId: string, data: CreateInteractionDto) {
+  async swipe(userId: string, recipeId: string, type: InteractionType) {
     const recipe = await prisma.recipe.findFirst({
       where: {
-        id: data.recipeId,
+        id: recipeId,
         status: "APPROVED",
       },
-      select: { id: true },
     });
 
     if (!recipe) {
-      throw new HttpError(404, "Recipe not found or not approved");
+      throw new HttpError(404, "Recipe not found");
     }
 
-    try {
-      return await prisma.recipeInteraction.create({
-        data: {
+    return prisma.recipeInteraction.upsert({
+      where: {
+        userId_recipeId: {
           userId,
-          recipeId: data.recipeId,
-          type: data.type,
+          recipeId,
         },
-      });
-    } catch (err: any) {
-      // Prisma unique constraint violation
-      if (err.code === "P2002") {
-        throw new HttpError(409, "User already interacted with this recipe");
-      }
-
-      throw err;
-    }
+      },
+      update: {
+        type,
+      },
+      create: {
+        userId,
+        recipeId,
+        type,
+      },
+    });
   }
 
-  async undoLast(userId: string) {
-    const lastInteraction = await prisma.recipeInteraction.findFirst({
+  async feed(userId: string, limit = 10) {
+    const interactions = await prisma.recipeInteraction.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: { id: true },
+      select: { recipeId: true },
     });
 
-    if (!lastInteraction) {
+    const excludedIds = interactions.map((i) => i.recipeId);
+
+    return prisma.recipe.findMany({
+      where: {
+        status: "APPROVED",
+        id: {
+          notIn: excludedIds,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+        },
+      },
+    });
+  }
+
+  async undo(userId: string) {
+    const last = await prisma.recipeInteraction.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!last) {
       throw new HttpError(404, "No interaction found");
     }
 
     await prisma.recipeInteraction.delete({
       where: {
-        id: lastInteraction.id,
+        userId_recipeId: {
+          userId,
+          recipeId: last.recipeId,
+        },
       },
     });
 
     return { undone: true };
-  }
-
-  async getUserInteractions(userId: string) {
-    return prisma.recipeInteraction.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      include: {
-        recipe: {
-          select: {
-            id: true,
-            title: true,
-            imageUrl: true,
-          },
-        },
-      },
-    });
   }
 }

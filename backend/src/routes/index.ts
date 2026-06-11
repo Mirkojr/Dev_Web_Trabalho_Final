@@ -11,6 +11,7 @@ import userAllergensRoutes from "../modules/user-allergens/user-allergens.routes
 import userDietPreferencesRoutes from "../modules/user-diet-preferences/user-diet-preferences.routes";
 import interactionsRoutes from "../modules/recipe-interactions/recipe-interactions.routes";
 import categoriesRoutes from "../modules/categories/categories.routes";
+import commentsRoutes from "../modules/comments/comments.routes";
 
 const router = Router();
 
@@ -31,5 +32,7 @@ router.use("/users/me/allergens", userAllergensRoutes);
 router.use("/users/me/diet-preferences", userDietPreferencesRoutes);
 router.use("/categories", categoriesRoutes);
 router.use("/interactions", interactionsRoutes);
+router.use("/comments", commentsRoutes);
+
 
 export default router;
