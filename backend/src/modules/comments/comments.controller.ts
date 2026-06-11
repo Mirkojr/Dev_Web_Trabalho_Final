@@ -6,6 +6,8 @@ import {
   commentIdParamSchema,
 } from "./comments.schemas";
 
+import { getAuthUser } from "../../utils/get-auth-user";
+
 export class CommentsController {
   private service = new CommentsService();
 
@@ -36,41 +38,64 @@ export class CommentsController {
     }
   };
 
-  update = async (req: Request, res: Response, next: NextFunction) => {
+  update = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const { id } = commentIdParamSchema.parse(req.params);
-      const data = updateCommentSchema.parse(req.body);
+      const { id } =
+        commentIdParamSchema.parse(
+          req.params
+        );
 
-      const isAdmin = req.user!.role === "ADMIN";
+      const data =
+        updateCommentSchema.parse(
+          req.body
+        );
 
-      const comment = await this.service.update(
-        id,
-        req.user!.id,
-        isAdmin,
-        data
-      );
+      const user =
+        getAuthUser(req);
+
+      const comment =
+        await this.service.update(
+          id,
+          user.id,
+          user.role,
+          data
+        );
 
       return res.json(comment);
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
+  delete = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const { id } = commentIdParamSchema.parse(req.params);
+      const { id } =
+        commentIdParamSchema.parse(
+          req.params
+        );
 
-      const isAdmin = req.user!.role === "ADMIN";
+      const user =
+        getAuthUser(req);
 
-      const result = await this.service.delete(
+      await this.service.delete(
         id,
-        req.user!.id,
-        isAdmin
+        user.id,
+        user.role
       );
 
-      return res.json(result);
-    } catch (err) {
-      next(err);
+      return res
+        .status(204)
+        .send();
+    } catch (error) {
+      next(error);
     }
   };
 }

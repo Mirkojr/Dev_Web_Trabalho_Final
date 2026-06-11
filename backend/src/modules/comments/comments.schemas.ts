@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const commentIdParamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 export const createCommentSchema = z.object({
-  recipeId: z.string().uuid(),
+  recipeId: z.uuid(),
   content: z.string().min(1).max(500),
 });
 

@@ -1,8 +1,29 @@
+import { RoleName } from "../../generated/prisma/wasm";
 import { prisma } from "../../lib/prisma";
 import { HttpError } from "../../utils/http-error";
+import { validateCommentOwnership } from "../../utils/validate-comment-ownership";
 import { CreateCommentDto, UpdateCommentDto } from "./comments.schemas";
 
 export class CommentsService {
+
+  private async findCommentById(
+    id: string
+  ) {
+    const comment =
+      await prisma.comment.findUnique({
+        where: { id },
+      });
+
+    if (!comment) {
+      throw new HttpError(
+        404,
+        "Comment not found"
+      );
+    }
+
+    return comment;
+  }
+
   async create(userId: string, data: CreateCommentDto) {
     const recipe = await prisma.recipe.findUnique({
       where: { id: data.recipeId },
@@ -49,44 +70,48 @@ export class CommentsService {
     });
   }
 
-  async update(commentId: string, userId: string, isAdmin: boolean, data: UpdateCommentDto) {
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
+  async update(
+    id: string,
+    currentUserId: string,
+    currentUserRole: RoleName,
+    data: UpdateCommentDto
+  ) {
+    const comment =
+      await this.findCommentById(id);
+
+    validateCommentOwnership({
+      commentUserId: comment.userId,
+      currentUserId,
+      currentUserRole,
     });
 
-    if (!comment) {
-      throw new HttpError(404, "Comment not found");
-    }
-
-    if (comment.userId !== userId && !isAdmin) {
-      throw new HttpError(403, "Not allowed");
-    }
-
     return prisma.comment.update({
-      where: { id: commentId },
+      where: { id },
+
       data: {
         content: data.content,
       },
     });
   }
 
-  async delete(commentId: string, userId: string, isAdmin: boolean) {
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
+  async delete(
+    id: string,
+    currentUserId: string,
+    currentUserRole: RoleName
+  ) {
+    const comment =
+      await this.findCommentById(id);
+
+    validateCommentOwnership({
+      commentUserId: comment.userId,
+      currentUserId,
+      currentUserRole,
     });
-
-    if (!comment) {
-      throw new HttpError(404, "Comment not found");
-    }
-
-    if (comment.userId !== userId && !isAdmin) {
-      throw new HttpError(403, "Not allowed");
-    }
 
     await prisma.comment.delete({
-      where: { id: commentId },
+      where: { id },
     });
 
-    return { deleted: true };
+    return;
   }
 }

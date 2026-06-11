@@ -135,7 +135,7 @@ router.post("/", controller.create);
  *       404:
  *         description: Comentário não encontrado
  */
-router.put("/:id", controller.update);
+router.patch("/:id", controller.update);
 
 /**
  * @openapi
@@ -154,7 +154,7 @@ router.put("/:id", controller.update);
  *           type: string
  *           format: uuid
  *     responses:
- *       200:
+ *       204:
  *         description: Comentário removido
  *         content:
  *           application/json:
