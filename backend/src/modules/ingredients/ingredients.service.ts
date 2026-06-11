@@ -1,34 +1,15 @@
 import { prisma } from "../../lib/prisma";
 
-import { HttpError }
-  from "../../utils/http-error";
+import { HttpError } from "../../utils/http-error";
 
 import {
   CreateIngredientDto,
+  UpdateIngredientDto,
 } from "./ingredients.schemas";
 
 export class IngredientsService {
   async findAll() {
     return prisma.ingredient.findMany({
-      where: {
-        status: "APPROVED",
-      },
-
-      include: {
-        allergens: {
-          include: {
-            allergen: true,
-          },
-        },
-
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-
       orderBy: {
         name: "asc",
       },
@@ -38,21 +19,12 @@ export class IngredientsService {
   async findById(id: string) {
     const ingredient =
       await prisma.ingredient.findUnique({
-        where: {
-          id,
-        },
+        where: { id },
 
         include: {
           allergens: {
             include: {
               allergen: true,
-            },
-          },
-
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
             },
           },
         },
@@ -72,71 +44,31 @@ export class IngredientsService {
     userId: string,
     data: CreateIngredientDto
   ) {
-    const existing =
-      await prisma.ingredient.findUnique({
-        where: {
-          name: data.name,
-        },
-      });
-
-    if (existing) {
-      throw new HttpError(
-        409,
-        "Ingredient already exists"
-      );
-    }
-
-    const allergens =
-      await prisma.allergen.findMany({
-        where: {
-          id: {
-            in: data.allergenIds,
-          },
-        },
-      });
-
-    if (
-      allergens.length !==
-      data.allergenIds.length
-    ) {
-      throw new HttpError(
-        400,
-        "Invalid allergen ids"
-      );
-    }
-
     return prisma.ingredient.create({
       data: {
         name: data.name,
-
-        status: "PENDING",
-
         createdById: userId,
-
-        allergens: {
-          create:
-            data.allergenIds.map(
-              (allergenId) => ({
-                allergenId,
-              })
-            ),
-        },
       },
+    });
+  }
 
-      include: {
-        allergens: {
-          include: {
-            allergen: true,
-          },
-        },
+  async update(
+    id: string,
+    data: UpdateIngredientDto
+  ) {
+    await this.findById(id);
 
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
+    return prisma.ingredient.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string) {
+    await this.findById(id);
+
+    await prisma.ingredient.delete({
+      where: { id },
     });
   }
 }
