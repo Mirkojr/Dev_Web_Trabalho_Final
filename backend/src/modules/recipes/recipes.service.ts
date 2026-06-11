@@ -223,4 +223,76 @@ export class RecipesService {
 
     return recipe;
     }
+
+  async getSwipeFeed(userId: string, cursor?: string) {
+    const [userAllergens, userDiets, interactions] = await Promise.all([
+      prisma.userAllergen.findMany({
+        where: { userId },
+        select: { allergenId: true },
+      }),
+
+      prisma.userDietPreference.findMany({
+        where: { userId },
+        select: { dietPreferenceId: true },
+      }),
+
+      prisma.recipeInteraction.findMany({
+        where: { userId },
+        select: { recipeId: true },
+      }),
+    ]);
+
+    const excludedIds = interactions.map(i => i.recipeId);
+
+    const allergenIds = userAllergens.map(a => a.allergenId);
+
+    const baseWhere = {
+      status: "APPROVED" as const,
+      id: {
+        notIn: excludedIds,
+      },
+      ingredients: {
+        none: {
+          ingredient: {
+            allergens: {
+              some: {
+                allergenId: {
+                  in: allergenIds,
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    // 1. PRIMEIRO: receitas nunca vistas
+    const freshRecipes = await prisma.recipe.findMany({
+      where: baseWhere,
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 20,
+    });
+
+    // 2. FALLBACK: se não tiver conteúdo suficiente, recicla antigas
+    if (freshRecipes.length < 10) {
+      const fallback = await prisma.recipe.findMany({
+        where: {
+          status: "APPROVED",
+          id: {
+            notIn: excludedIds,
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        take: 20,
+      });
+
+      return fallback;
+    }
+
+    return freshRecipes;
+  }
 }

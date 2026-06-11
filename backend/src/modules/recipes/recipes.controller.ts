@@ -85,4 +85,23 @@ export class RecipesController {
         next(error);
     }
     };
+  
+  getSwipeFeed = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+    ) => {
+    try {
+      const cursor = req.query.cursor as string | undefined;
+
+      const feed = await this.service.getSwipeFeed(
+        req.user!.id,
+        cursor
+      );
+
+      return res.json(feed);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
