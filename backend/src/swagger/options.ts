@@ -11,6 +11,7 @@ const tagOrder = [
   "Comments",
   "Recipe Interactions",
   "Moderation",
+  "Dashboard",
 ];
 
 const pathOrder = [
@@ -40,6 +41,7 @@ const pathOrder = [
   "/moderation/recipes/{id}",
   "/moderation/categories/{id}",
   "/moderation/ingredients/{id}",
+  "/dashboard",
 ];
 
 const methodOrder = [

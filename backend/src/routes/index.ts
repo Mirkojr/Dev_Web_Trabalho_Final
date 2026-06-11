@@ -12,6 +12,7 @@ import userDietPreferencesRoutes from "../modules/user-diet-preferences/user-die
 import interactionsRoutes from "../modules/recipe-interactions/recipe-interactions.routes";
 import categoriesRoutes from "../modules/categories/categories.routes";
 import commentsRoutes from "../modules/comments/comments.routes";
+import dashboardRoutes from "../modules/dashboard/dashboard.routes";
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.use("/users/me/diet-preferences", userDietPreferencesRoutes);
 router.use("/categories", categoriesRoutes);
 router.use("/interactions", interactionsRoutes);
 router.use("/comments", commentsRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 
 export default router;
