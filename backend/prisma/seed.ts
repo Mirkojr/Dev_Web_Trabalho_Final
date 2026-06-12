@@ -13,9 +13,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Iniciando seed completo...");
 
+  console.log("⏱️ Tempo estimado é de 6 minutos, mas pode variar dependendo do desempenho do seu computador.");
+
   // =====================================
   // LIMPEZA
   // =====================================
+  console.log("🧹 Limpando dados existentes...");
 
   await prisma.recipeInteraction.deleteMany();
   await prisma.comment.deleteMany();
@@ -39,6 +42,9 @@ async function main() {
 
   await prisma.user.deleteMany();
 
+  console.log("🧹 Dados limpos com sucesso!");
+
+
   // =====================================
   // SENHA PADRÃO
   // =====================================
@@ -51,6 +57,8 @@ async function main() {
   // =====================================
   // USERS
   // =====================================
+
+  console.log("👤 Criando usuários...");
 
   const admin = await prisma.user.create({
     data: {
@@ -111,11 +119,13 @@ async function main() {
   ]);
 
   const allUsers = [admin, ...users];
+  console.log("👤 Usuários criados com sucesso!");
 
   // =====================================
   // ALERGÊNICOS
   // =====================================
 
+  console.log("🧪 Criando alergênicos...");
   const allergens = await Promise.all(
     [
       "Glúten",
@@ -131,10 +141,13 @@ async function main() {
     )
   );
 
+  console.log("🧪 Alergênicos criados com sucesso!");
+
   // =====================================
   // DIET PREFERENCES
   // =====================================
 
+  console.log("🥗 Criando dietas...");
   const dietPreferences =
     await Promise.all(
       [
@@ -150,9 +163,13 @@ async function main() {
       )
     );
 
+  console.log("🥗 Dietas criadas com sucesso!");
+
   // =====================================
   // CATEGORIAS
   // =====================================
+
+  console.log("📂 Criando categorias...");
 
   const categories =
     await Promise.all(
@@ -176,11 +193,13 @@ async function main() {
         })
       )
     );
+    console.log("📂 Categorias criadas com sucesso!");
 
   // =====================================
   // INGREDIENTES
   // =====================================
 
+  console.log("🥕 Criando ingredientes...");
   const ingredientNames = [
     "Farinha",
     "Leite",
@@ -223,9 +242,12 @@ async function main() {
       )
     );
 
+  console.log("🥕 Ingredientes criados com sucesso!");
   // =====================================
   // INGREDIENTE -> ALERGÊNICO
   // =====================================
+
+  console.log("🔬 Relacionando ingredientes com alergênicos...");
 
   const allergenByName = Object.fromEntries(
     allergens.map((a) => [a.name, a])
@@ -274,10 +296,13 @@ async function main() {
     ],
   });
 
+  console.log("🔬 Ingredientes relacionados com alergênicos com sucesso!");
+
   // =====================================
   // USER ALLERGENS
   // =====================================
 
+  console.log("👤 Relacionando usuários com alergênicos...");
   await prisma.userAllergen.createMany({
     data: [
       {
@@ -300,9 +325,12 @@ async function main() {
     ],
   });
 
+  console.log("👤 Usuários relacionados com alergênicos com sucesso!");
   // =====================================
   // USER DIET PREFERENCES
   // =====================================
+
+  console.log("👤 Relacionando usuários com dietas...");
 
   await prisma.userDietPreference.createMany({
     data: [
@@ -332,9 +360,13 @@ async function main() {
     ],
   });
 
+  console.log("👤 Usuários relacionados com dietas com sucesso!");
+
   // =====================================
   // RECEITAS
   // =====================================
+
+  console.log("🍽️ Criando receitas...");
 
   const recipeTitles = [
     "Bolo de Chocolate",
@@ -396,9 +428,13 @@ async function main() {
     recipes.push(recipe);
   }
 
+  console.log("🍽️ Receitas criadas com sucesso!");
+
   // =====================================
   // RECEITA -> CATEGORIAS
   // =====================================
+
+  console.log("🔗 Relacionando receitas com categorias...");
 
   for (let i = 0; i < recipes.length; i++) {
     await prisma.recipeCategory.createMany({
@@ -423,9 +459,13 @@ async function main() {
     });
   }
 
+  console.log("🔗 Receitas relacionadas com categorias com sucesso!");
+
   // =====================================
   // RECEITA -> DIETAS
   // =====================================
+
+  console.log("🔗 Relacionando receitas com dietas...");
 
   for (let i = 0; i < recipes.length; i++) {
     if (i % 2 === 0) {
@@ -445,9 +485,13 @@ async function main() {
     }
   }
 
+  console.log("🔗 Receitas relacionadas com dietas com sucesso!");
+
   // =====================================
   // RECEITA -> INGREDIENTES
   // =====================================
+
+  console.log("🔗 Relacionando receitas com ingredientes...");
 
   for (let i = 0; i < recipes.length; i++) {
     for (let j = 0; j < 5; j++) {
@@ -472,9 +516,12 @@ async function main() {
     }
   }
 
+  console.log("🔗 Ingredientes relacionados com alergênicos com sucesso!");
   // =====================================
   // COMENTÁRIOS
   // =====================================
+
+  console.log("💬 Criando comentários...");
 
   const commentsTexts = [
     "Receita excelente.",
@@ -510,6 +557,8 @@ async function main() {
     });
   }
 
+  console.log("💬 Comentários criados com sucesso!");
+
   // =====================================
   // INTERAÇÕES
   // =====================================
@@ -520,6 +569,8 @@ async function main() {
   // Portanto não podemos gerar
   // combinações repetidas.
   //
+
+  console.log("🔥 Criando interações...");
 
   const usedPairs = new Set<string>();
 
@@ -562,6 +613,8 @@ async function main() {
       },
     });
   }
+  
+  console.log("🔥 Interações criadas com sucesso!");
 
   // =====================================
   // RESUMO
@@ -594,6 +647,11 @@ async function main() {
   console.log(
     "🔥 Interações: 100"
   );
+
+  console.log(
+    "✅ Seed concluído com sucesso!"
+  );
+
 }
 
 main()
