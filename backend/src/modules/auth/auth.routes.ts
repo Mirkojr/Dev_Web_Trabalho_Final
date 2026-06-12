@@ -168,8 +168,6 @@ router.post("/login", controller.login);
  *         description: Token ausente ou inválido
  *       404:
  *         description: Usuário não encontrado
- *       501:
- *         description: Não implementado
  */
 router.get("/me", authMiddleware, controller.me);
 
