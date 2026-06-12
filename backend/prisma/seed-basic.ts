@@ -426,19 +426,19 @@ async function main() {
   console.log("\nUsuários:");
 
   console.log(
-    "admin@smashorpass.com / 123456"
+    "admin@smash.com / 12345678"
   );
 
   console.log(
-    "joao@email.com / 123456"
+    "joao@email.com / 12345678"
   );
 
   console.log(
-    "maria@email.com / 123456"
+    "maria@email.com / 12345678"
   );
 
   console.log(
-    "pedro@email.com / 123456"
+    "pedro@email.com / 12345678"
   );
 }
 
