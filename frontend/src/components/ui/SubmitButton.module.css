@@ -1,0 +1,20 @@
+.button {
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 999px;
+  background: #b5277c;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(181, 39, 124, 0.4);
+}
+
+.button:active { transform: translateY(0); }
+.button:disabled { opacity: 0.7; cursor: progress; }
