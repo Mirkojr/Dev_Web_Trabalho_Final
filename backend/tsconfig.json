@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+
+    "target": "ES2022",
+
+    "module": "commonjs",
+    "moduleResolution": "Node",
+
+    "strict": true,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "sourceMap": true,
+
+    "types": ["node", "jest"],
+
+  },
+
+  "include": ["src", "tests", "prisma"],
+  "exclude": ["node_modules", "dist"]
+}

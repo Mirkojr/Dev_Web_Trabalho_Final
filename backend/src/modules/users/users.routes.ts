@@ -1,0 +1,298 @@
+import { Router } from "express";
+
+import { authMiddleware } from "../../middlewares/auth.middleware";
+
+import { UsersController } from "./users.controller";
+
+const router = Router();
+
+const controller = new UsersController();
+
+/**
+ * @openapi
+ * /users/me:
+ *   patch:
+ *     tags:
+ *       - Users
+ *     summary: Atualizar perfil do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 3
+ *                 example: Artur Silva
+ *               bio:
+ *                 type: string
+ *                 maxLength: 500
+ *                 example: Desenvolvedor apaixonado por produto e UI.
+ *               avatarUrl:
+ *                 type: string
+ *                 format: uri
+ *                 example: https://cdn.example.com/avatars/artur.png
+ *     responses:
+ *       200:
+ *         description: Perfil atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 avatarUrl:
+ *                   type: string
+ *                   nullable: true
+ *                 bio:
+ *                   type: string
+ *                   nullable: true
+ *             example:
+ *               id: cm1q2w3e4r5t6y7u8i9o0p
+ *               name: Artur Silva
+ *               username: artur_silva
+ *               email: artur@example.com
+ *               role: USER
+ *               avatarUrl: https://cdn.example.com/avatars/artur.png
+ *               bio: Desenvolvedor apaixonado por produto e UI.
+ *       401:
+ *         description: Token ausente ou inválido
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.patch(
+  "/me",
+  authMiddleware,
+  controller.updateProfile
+);
+
+/**
+ * @openapi
+ * /users/me/allergens:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Listar alergênicos do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de vínculos do usuário com alergênicos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   userId:
+ *                     type: string
+ *                   allergenId:
+ *                     type: string
+ *                   allergen:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *             example:
+ *               - userId: cm1q2w3e4r5t6y7u8i9o0p
+ *                 allergenId: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 allergen:
+ *                   id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                   name: Amendoim
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+router.get(
+  "/me/allergens",
+  authMiddleware,
+  controller.getAllergens
+);
+
+/**
+ * @openapi
+ * /users/me/allergens:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Atualizar alergênicos do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - allergenIds
+ *             properties:
+ *               allergenIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
+ *             example:
+ *               allergenIds:
+ *                 - 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 - 9a2f4c1d-63f0-4d1a-8d66-4a8f7e2b4567
+ *     responses:
+ *       200:
+ *         description: Alergênicos atualizados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   userId:
+ *                     type: string
+ *                   allergenId:
+ *                     type: string
+ *                   allergen:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *             example:
+ *               - userId: cm1q2w3e4r5t6y7u8i9o0p
+ *                 allergenId: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 allergen:
+ *                   id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                   name: Amendoim
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+router.put(
+  "/me/allergens",
+  authMiddleware,
+  controller.updateAllergens
+);
+
+/**
+ * @openapi
+ * /users/me/diet-preferences:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Listar preferências alimentares do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de vínculos do usuário com preferências alimentares
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   userId:
+ *                     type: string
+ *                   dietPreferenceId:
+ *                     type: string
+ *                   dietPreference:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *             example:
+ *               - userId: cm1q2w3e4r5t6y7u8i9o0p
+ *                 dietPreferenceId: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 dietPreference:
+ *                   id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                   name: Vegana
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+router.get(
+  "/me/diet-preferences",
+  authMiddleware,
+  controller.getDietPreferences
+);
+
+/**
+ * @openapi
+ * /users/me/diet-preferences:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Atualizar preferências alimentares do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - dietPreferenceIds
+ *             properties:
+ *               dietPreferenceIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uuid
+ *             example:
+ *               dietPreferenceIds:
+ *                 - 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 - 9a2f4c1d-63f0-4d1a-8d66-4a8f7e2b4567
+ *     responses:
+ *       200:
+ *         description: Preferências alimentares atualizadas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   userId:
+ *                     type: string
+ *                   dietPreferenceId:
+ *                     type: string
+ *                   dietPreference:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *             example:
+ *               - userId: cm1q2w3e4r5t6y7u8i9o0p
+ *                 dietPreferenceId: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                 dietPreference:
+ *                   id: 8d8e9f2b-7b54-4e0b-9b2e-5a7fd0a1d123
+ *                   name: Vegana
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+router.put(
+  "/me/diet-preferences",
+  authMiddleware,
+  controller.updateDietPreferences
+);
+
+export default router;

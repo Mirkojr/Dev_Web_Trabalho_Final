@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RoleName {
+  USER
+  ADMIN
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum InteractionType {
+  SMASH
+  PASS
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  bio          String?
+  role         RoleName @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipes            Recipe[]
+  comments           Comment[]
+  interactions       RecipeInteraction[]
+  allergens          UserAllergen[]
+  dietPreferences    UserDietPreference[]
+  createdCategories  Category[]
+  createdIngredients Ingredient[]
+}
+
+model Recipe {
+  id                     String     @id @default(uuid())
+  title                  String
+  description            String
+  preparationMethod      String
+  preparationTimeMinutes Int
+  difficulty             Difficulty
+
+  imageUrl String?
+
+  status ModerationStatus @default(PENDING)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments        Comment[]
+  interactions    RecipeInteraction[]
+  categories      RecipeCategory[]
+  ingredients     RecipeIngredient[]
+  dietPreferences RecipeDietPreference[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Category {
+  id     String           @id @default(uuid())
+  name   String           @unique
+  status ModerationStatus @default(PENDING)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  recipes RecipeCategory[]
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdById])
+}
+
+model Ingredient {
+  id     String           @id @default(uuid())
+  name   String           @unique
+  status ModerationStatus @default(PENDING)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  recipes   RecipeIngredient[]
+  allergens IngredientAllergen[]
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdById])
+}
+
+model Allergen {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users       UserAllergen[]
+  ingredients IngredientAllergen[]
+}
+
+model DietPreference {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users   UserDietPreference[]
+  recipes RecipeDietPreference[]
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String
+
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([recipeId])
+  @@index([userId])
+}
+
+model RecipeInteraction {
+  id String @id @default(uuid())
+
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type InteractionType
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, recipeId])
+  @@index([userId])
+  @@index([recipeId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model UserAllergen {
+  userId     String
+  allergenId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allergen Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
+
+  @@id([userId, allergenId])
+}
+
+model UserDietPreference {
+  userId           String
+  dietPreferenceId String
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dietPreference DietPreference @relation(fields: [dietPreferenceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, dietPreferenceId])
+}
+
+model RecipeCategory {
+  recipeId   String
+  categoryId String
+
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, categoryId])
+}
+
+model RecipeDietPreference {
+  recipeId         String
+  dietPreferenceId String
+
+  recipe         Recipe         @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  dietPreference DietPreference @relation(fields: [dietPreferenceId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, dietPreferenceId])
+}
+
+model IngredientAllergen {
+  ingredientId String
+  allergenId   String
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  allergen   Allergen   @relation(fields: [allergenId], references: [id], onDelete: Cascade)
+
+  @@id([ingredientId, allergenId])
+}
+
+model RecipeIngredient {
+  id String @id @default(uuid())
+
+  recipeId     String
+  ingredientId String
+
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  quantity Decimal @db.Decimal(10, 2)
+  unit     String
+
+  @@index([recipeId])
+  @@index([ingredientId])
+}
