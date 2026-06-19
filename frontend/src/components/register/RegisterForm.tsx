@@ -6,6 +6,9 @@ import InputField from "@/components/ui/InputField";
 import SubmitButton from "@/components/ui/SubmitButton";
 import styles from "./RegisterForm.module.css";
 import { authService } from "@/services/auth.service";
+import { useAuth } from "@/hooks/useAuth";
+
+
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -16,44 +19,30 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  const { register, loading, error, setError } = useAuth();
+
+  function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    setError("");
 
-    // validações espelhando o schema do backend
     if (name.trim().length < 3) {
-      setError("O nome precisa ter pelo menos 3 caracteres.");
-      return;
+      setError("O nome precisa ter pelo menos 3 caracteres."); return;
     }
     if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
-      setError("Usuário: 3 a 30 caracteres, apenas letras, números e _.");
-      return;
+      setError("Usuário: 3 a 30 caracteres, apenas letras, números e _."); return;
     }
     if (password.length < 8) {
-      setError("A senha precisa ter pelo menos 8 caracteres.");
-      return;
+      setError("A senha precisa ter pelo menos 8 caracteres."); return;
     }
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
-      return;
+      setError("As senhas não coincidem."); return;
     }
     if (!acceptedTerms) {
-      setError("Você precisa aceitar os Termos e Condições.");
-      return;
+      setError("Você precisa aceitar os Termos e Condições."); return;
     }
 
-    setLoading(true);
-    try {
-      await authService.register({ name, username, email, password });
-      router.push("/login");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
-    } finally {
-      setLoading(false);
-    }
+    // a lógica de API/loading/erro/redirect agora é do hook
+    register({ name, username, email, password });
   }
 
   return (
