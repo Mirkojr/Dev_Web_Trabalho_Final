@@ -1,62 +1,108 @@
 import { apiRequest } from "./api";
-import {
-	ApiRecipe,
-	Difficulty,
-	InteractionType,
-	RecipeView,
-} from "@/types/recipe";
+import type { RecipeView, InteractionType } from "@/types/recipe";
 
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+/**
+ * Formato cru que a API retorna para uma receita.
+ * (mantido local ao service; os componentes só consomem o RecipeView mapeado)
+ */
+type ApiRecipe = {
+	id: string;
+	title: string;
+	description?: string;
+	preparationMethod?: string;
+	preparationTimeMinutes?: number;
+	difficulty?: string;
+	imageUrl?: string | null;
+	status?: string;
+	authorId?: string;
+	author?: {
+		id: string;
+		username: string;
+		avatarUrl?: string | null;
+	};
+	categories?: Array<{
+		category?: { id: string; name: string; status?: string };
+	}>;
+	ingredients?: Array<{
+		quantity?: number;
+		unit?: string;
+		ingredient?: { id: string; name: string };
+	}>;
+};
+
+const DIFFICULTY_LABELS: Record<string, string> = {
 	EASY: "Fácil",
 	MEDIUM: "Médio",
 	HARD: "Difícil",
 };
 
-function buildIngredientLabel(item: ApiRecipe["ingredients"] extends (infer T)[]
-	? T
-	: never): string {
-	const amount = [item.quantity, item.unit].filter(Boolean).join(" ").trim();
-	return amount ? `${amount} de ${item.ingredient.name}` : item.ingredient.name;
+function buildIngredientLabel(item: ApiRecipe["ingredients"][number]): string {
+	const quantity = item.quantity ?? "";
+	const unit = item.unit ?? "";
+	const name = item.ingredient?.name ?? "";
+	return `${quantity} ${unit} de ${name}`.replace(/\s+/g, " ").trim();
 }
 
-// Converte a receita da API no formato que a UI espera
-export function mapRecipe(api: ApiRecipe): RecipeView {
+export function mapRecipe(recipe: ApiRecipe): RecipeView {
 	return {
-		id: api.id,
-		title: api.title,
-		subtitle: api.description,
-		imageUrl: api.imageUrl ?? undefined,
-		preparation: api.preparationMethod,
-		difficultyLabel: DIFFICULTY_LABELS[api.difficulty] ?? api.difficulty,
-		timeLabel: `${api.preparationTimeMinutes} min`,
-		tags: (api.categories ?? []).map((c) => c.category.name),
-		ingredients: (api.ingredients ?? []).map(buildIngredientLabel),
-		authorName: api.author?.username ?? "",
+		id: recipe.id,
+		title: recipe.title,
+		subtitle: recipe.description ?? "",
+		imageUrl: recipe.imageUrl ?? undefined,
+		preparation: recipe.preparationMethod ?? "",
+		difficultyLabel:
+			(recipe.difficulty && DIFFICULTY_LABELS[recipe.difficulty]) ??
+			recipe.difficulty ??
+			"",
+		timeLabel: recipe.preparationTimeMinutes
+			? `${recipe.preparationTimeMinutes} minutos`
+			: "",
+		tags: (recipe.categories ?? [])
+			.map((entry) => entry.category?.name)
+			.filter((name): name is string => Boolean(name)),
+		ingredients: (recipe.ingredients ?? []).map(buildIngredientLabel),
+		authorName: recipe.author?.username ?? "",
 	};
 }
 
 export const recipeService = {
+	/** Feed de swipe (receitas ainda não interagidas). */
 	async getFeed(limit = 10): Promise<RecipeView[]> {
-		const recipes = await apiRequest<ApiRecipe[]>(
+		const data = await apiRequest<ApiRecipe[]>(
 			`/interactions/feed?limit=${limit}`,
 			{ auth: true }
 		);
-		return recipes.map(mapRecipe);
+		return data.map(mapRecipe);
 	},
 
-	async getById(id: string): Promise<ApiRecipe> {
-		return apiRequest<ApiRecipe>(`/recipes/${id}`);
+	/** Uma receita específica (Tela 8). */
+	async getById(id: string): Promise<RecipeView> {
+		const data = await apiRequest<ApiRecipe>(`/recipes/${id}`, { auth: true });
+		return mapRecipe(data);
 	},
 
-	async swipe(recipeId: string, type: InteractionType): Promise<void> {
-		await apiRequest(`/interactions/swipe`, {
-			method: "POST",
+	/** Receitas curtidas / smashs do usuário (Tela 7). */
+	async getLiked(): Promise<RecipeView[]> {
+		const data = await apiRequest<ApiRecipe[]>("/users/me/smashs", {
 			auth: true,
+		});
+		return data.map(mapRecipe);
+	},
+
+	/** Registra um swipe (SMASH/PASS). */
+	async swipe(recipeId: string, type: InteractionType): Promise<void> {
+		await apiRequest("/interactions/swipe", {
+			method: "POST",
 			body: { recipeId, type },
+			auth: true,
 		});
 	},
 
+	/** Desfaz a última interação. */
 	async undo(): Promise<void> {
-		await apiRequest(`/interactions/undo`, { method: "POST", auth: true });
+		await apiRequest("/interactions/undo", {
+			method: "POST",
+			auth: true,
+		});
 	},
 };
