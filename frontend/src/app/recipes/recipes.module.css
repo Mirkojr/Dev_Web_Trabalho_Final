@@ -1,0 +1,64 @@
+.page {
+	display: grid;
+	grid-template-columns: 104px 1fr;
+	min-height: 100vh;
+	background: #fff;
+}
+
+.menuWrap {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	padding: 32px 28px 64px;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.6rem;
+	font-weight: 800;
+	color: #1a1a1a;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+	gap: 20px;
+}
+
+.state {
+	margin-top: 8px;
+	color: #6b6b6b;
+	font-size: 0.95rem;
+}
+
+/* Mobile: 1 coluna, menu vira barra inferior fixa */
+@media (max-width: 991px) {
+	.page {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.menuWrap {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: auto;
+		z-index: 20;
+	}
+
+	.main {
+		padding: 20px 16px 96px;
+	}
+
+	.grid {
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		gap: 14px;
+	}
+}
