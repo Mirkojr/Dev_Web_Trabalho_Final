@@ -1,0 +1,110 @@
+.page {
+	display: grid;
+	grid-template-columns: 104px 1fr;
+	min-height: 100vh;
+	background: #fff;
+}
+
+.menuWrap {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+}
+
+.main {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	padding: 32px 24px 64px;
+}
+
+.container {
+	width: 100%;
+	max-width: 720px;
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+}
+
+.header {
+	text-align: center;
+}
+
+.eyebrow {
+	margin: 0;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #6b6b6b;
+}
+
+.title {
+	margin: 4px 0 0;
+	font-size: 1.6rem;
+	font-weight: 800;
+	color: #1a1a1a;
+}
+
+.image {
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	border-radius: 16px;
+	background-color: #d4d4d4;
+	background-size: cover;
+	background-position: center;
+}
+
+.back {
+	position: absolute;
+	top: 24px;
+	right: 24px;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 12px;
+	background: #f1f1f1;
+	color: #1a1a1a;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+.back:hover {
+	background: #e6e6e6;
+}
+
+.state {
+	margin-top: 24px;
+	text-align: center;
+	color: #6b6b6b;
+	font-size: 0.95rem;
+}
+
+/* Mobile: 1 coluna, menu vira barra inferior fixa */
+@media (max-width: 991px) {
+	.page {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.menuWrap {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: auto;
+		z-index: 20;
+	}
+
+	.main {
+		padding: 20px 16px 96px;
+	}
+
+	.back {
+		top: 16px;
+		right: 16px;
+	}
+}
