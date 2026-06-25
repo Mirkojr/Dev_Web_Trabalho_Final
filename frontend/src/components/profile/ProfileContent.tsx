@@ -69,11 +69,17 @@ export default function ProfileContent() {
 	if (!user) return null;
 
 	const mainOptions: SettingOption[] = [
-		{ icon: <ProfileIcon />, title: "Meu perfil", subtitle: "Mude seu perfil" },
+		{
+			icon: <ProfileIcon />,
+			title: "Meu perfil",
+			subtitle: "Mude seu perfil",
+			onClick: () => router.push("/profile/edit"),
+		},
 		{
 			icon: <RecipesIcon />,
 			title: "Minhas receitas",
-			onClick: () => router.push("/recipes"),
+			subtitle: "Crie e edite suas receitas",
+			onClick: () => router.push("/recipes/mine"),
 		},
 		{ icon: <PreferencesIcon />, title: "Preferências Alimentares" },
 		{ icon: <NotificationsIcon />, title: "Notificações" },
