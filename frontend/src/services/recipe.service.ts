@@ -1,5 +1,10 @@
 import { apiRequest } from "./api";
-import type { RecipeView, InteractionType } from "@/types/recipe";
+import type {
+	RecipeView,
+	InteractionType,
+	RecipePayload,
+	ApiRecipe as ApiRecipeFull,
+} from "@/types/recipe";
 
 /**
  * Formato cru que a API retorna para uma receita.
@@ -75,10 +80,15 @@ export const recipeService = {
 		return data.map(mapRecipe);
 	},
 
-	/** Uma receita específica (Tela 8). */
+	/** Uma receita específica mapeada para a UI (Tela 8). */
 	async getById(id: string): Promise<RecipeView> {
 		const data = await apiRequest<ApiRecipe>(`/recipes/${id}`, { auth: true });
 		return mapRecipe(data);
+	},
+
+	/** Receita crua (com IDs de categorias/ingredientes) para pré-preencher o form de edição. */
+	async getRawById(id: string): Promise<ApiRecipeFull> {
+		return apiRequest<ApiRecipeFull>(`/recipes/${id}`, { auth: true });
 	},
 
 	/** Receitas curtidas / smashs do usuário (Tela 7). */
@@ -87,6 +97,41 @@ export const recipeService = {
 			auth: true,
 		});
 		return data.map(mapRecipe);
+	},
+
+	/**
+	 * Receitas criadas pelo usuário (Tela 10).
+	 * Obs.: a API só expõe GET /recipes (apenas APPROVED), então filtramos pelo autor
+	 * no cliente. Receitas PENDING não aparecem até serem aprovadas.
+	 */
+	async getMine(authorId: string): Promise<RecipeView[]> {
+		const data = await apiRequest<ApiRecipe[]>("/recipes", { auth: true });
+		return data
+			.filter((recipe) => (recipe.author?.id ?? recipe.authorId) === authorId)
+			.map(mapRecipe);
+	},
+
+	/** Cria uma receita (Tela 11). Nasce com status PENDING. */
+	async create(payload: RecipePayload): Promise<{ id: string }> {
+		return apiRequest<{ id: string }>("/recipes", {
+			method: "POST",
+			body: payload,
+			auth: true,
+		});
+	},
+
+	/** Atualiza uma receita existente. */
+	async update(id: string, payload: RecipePayload): Promise<{ id: string }> {
+		return apiRequest<{ id: string }>(`/recipes/${id}`, {
+			method: "PATCH",
+			body: payload,
+			auth: true,
+		});
+	},
+
+	/** Remove uma receita. */
+	async remove(id: string): Promise<void> {
+		await apiRequest(`/recipes/${id}`, { method: "DELETE", auth: true });
 	},
 
 	/** Registra um swipe (SMASH/PASS). */

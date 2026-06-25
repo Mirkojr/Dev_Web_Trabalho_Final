@@ -79,3 +79,28 @@ export type RecipeView = {
 	ingredients: string[];
 	authorName: string;
 };
+
+// ===== Catálogo + payloads de escrita (Telas 10/11) =====
+export type CatalogItem = {
+	id: string;
+	name: string;
+};
+
+export type RecipeIngredientInput = {
+	ingredientId: string;
+	quantity: number;
+	unit: string;
+};
+
+export type RecipePayload = {
+	title: string;
+	description: string;
+	preparationMethod: string;
+	preparationTimeMinutes: number;
+	difficulty: Difficulty;
+	categoryIds: string[];
+	dietPreferenceIds?: string[];
+	ingredients: RecipeIngredientInput[];
+	/** Ainda não persistido pelo backend (create/update fazem strip). */
+	imageUrl?: string;
+};

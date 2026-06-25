@@ -1,0 +1,212 @@
+"use client";
+
+import { useEffect, useState, type SyntheticEvent } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
+import { userService } from "@/services/user.service";
+import type { AuthUser } from "@/types/auth";
+import styles from "./EditProfileForm.module.css";
+
+const GENDER_OPTIONS = ["Feminino", "Masculino", "Outro", "Prefiro não dizer"];
+
+function buildAvatarStyle(avatar?: string) {
+	if (!avatar) return undefined;
+	return { backgroundImage: `url(${avatar})` };
+}
+
+export default function EditProfileForm() {
+	const router = useRouter();
+	const [user, setUser] = useState<AuthUser | null>(null);
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
+	const [gender, setGender] = useState("");
+	const [bio, setBio] = useState("");
+	const [avatarUrl, setAvatarUrl] = useState("");
+
+	const [loading, setLoading] = useState(true);
+	const [loadError, setLoadError] = useState<string | null>(null);
+	const [saving, setSaving] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		let active = true;
+
+		async function load() {
+			setLoading(true);
+			setLoadError(null);
+			try {
+				const data = await authService.me();
+				if (!active) return;
+				setUser(data);
+				const parts = data.name.trim().split(/\s+/);
+				setFirstName(parts.shift() ?? "");
+				setLastName(parts.join(" "));
+				setBio(data.bio ?? "");
+				setAvatarUrl(data.avatarUrl ?? "");
+			} catch (err) {
+				if (active) {
+					setLoadError(
+						err instanceof Error
+							? err.message
+							: "Não foi possível carregar seu perfil."
+					);
+				}
+			} finally {
+				if (active) setLoading(false);
+			}
+		}
+
+		load();
+
+		return () => {
+			active = false;
+		};
+	}, []);
+
+	async function handleSubmit(event: SyntheticEvent) {
+		event.preventDefault();
+		const name = `${firstName} ${lastName}`.replace(/\s+/g, " ").trim();
+		if (name.length < 3) {
+			setError("O nome completo deve ter ao menos 3 caracteres.");
+			return;
+		}
+
+		setSaving(true);
+		setError(null);
+
+		const payload: { name: string; bio?: string; avatarUrl?: string } = {
+			name,
+			bio: bio.trim(),
+		};
+		if (avatarUrl.trim()) payload.avatarUrl = avatarUrl.trim();
+
+		try {
+			await userService.updateProfile(payload);
+			router.push("/profile");
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "Não foi possível atualizar o perfil."
+			);
+			setSaving(false);
+		}
+	}
+
+	if (loading) return <p className={styles.state}>Carregando seu perfil…</p>;
+	if (loadError) return <p className={styles.state}>{loadError}</p>;
+
+	const previewName = `${firstName} ${lastName}`.trim() || user?.name || "";
+
+	return (
+		<form className={styles.container} onSubmit={handleSubmit}>
+			<h1 className={styles.pageTitle}>Profile</h1>
+
+			<section className={styles.banner}>
+				<span
+					className={styles.avatar}
+					style={buildAvatarStyle(avatarUrl || user?.avatarUrl || undefined)}
+				>
+					{!(avatarUrl || user?.avatarUrl) && (
+						<span className={styles.initial}>
+							{previewName.charAt(0).toUpperCase()}
+						</span>
+					)}
+				</span>
+				<div className={styles.bannerInfo}>
+					<p className={styles.bannerName}>{previewName}</p>
+					<p className={styles.bannerHandle}>
+						{user ? `@${user.username}` : ""}
+					</p>
+				</div>
+			</section>
+
+			<div className={styles.fields}>
+				<div className={styles.field}>
+					<label className={styles.label} htmlFor="firstName">
+						Qual seu primeiro nome?
+					</label>
+					<input
+						id="firstName"
+						className={styles.input}
+						value={firstName}
+						onChange={(event) => setFirstName(event.target.value)}
+					/>
+				</div>
+
+				<div className={styles.field}>
+					<label className={styles.label} htmlFor="lastName">
+						E seu último nome?
+					</label>
+					<input
+						id="lastName"
+						className={styles.input}
+						value={lastName}
+						onChange={(event) => setLastName(event.target.value)}
+					/>
+				</div>
+
+				<div className={styles.field}>
+					<label className={styles.label} htmlFor="gender">
+						Selecione o seu gênero:
+					</label>
+					<select
+						id="gender"
+						className={styles.input}
+						value={gender}
+						onChange={(event) => setGender(event.target.value)}
+					>
+						<option value="">Selecione…</option>
+						{GENDER_OPTIONS.map((option) => (
+							<option key={option} value={option}>
+								{option}
+							</option>
+						))}
+					</select>
+				</div>
+
+				<div className={styles.field}>
+					<label className={styles.label} htmlFor="avatarUrl">
+						URL do avatar (opcional)
+					</label>
+					<input
+						id="avatarUrl"
+						className={styles.input}
+						type="url"
+						placeholder="https://…"
+						value={avatarUrl}
+						onChange={(event) => setAvatarUrl(event.target.value)}
+					/>
+				</div>
+
+				<div className={styles.field}>
+					<label className={styles.label} htmlFor="bio">
+						Descrição:
+					</label>
+					<textarea
+						id="bio"
+						className={styles.textarea}
+						rows={4}
+						value={bio}
+						onChange={(event) => setBio(event.target.value)}
+						placeholder="Conte um pouco sobre você…"
+					/>
+				</div>
+			</div>
+
+			{error && <p className={styles.error}>{error}</p>}
+
+			<div className={styles.actions}>
+				<button type="submit" className={styles.update} disabled={saving}>
+					{saving ? "Atualizando…" : "Atualizar Perfil"}
+				</button>
+				<button
+					type="button"
+					className={styles.cancel}
+					onClick={() => router.push("/profile")}
+					disabled={saving}
+				>
+					Cancelar
+				</button>
+			</div>
+		</form>
+	);
+}
