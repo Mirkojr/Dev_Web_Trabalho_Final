@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
 
 import {
   AVATARS_DIRECTORY,
@@ -19,16 +20,29 @@ export class LocalStorageProvider implements StorageProvider {
   async save(
     file: UploadFile,
     folder: UploadFolder,
-  ): Promise<StoredFile> {
+    ): Promise<StoredFile> {
     const filename = this.buildFilename();
 
     const filepath = this.resolveFilePath(folder, filename);
+    
+    // Processamento da imagem usando Sharp
+    const optimizedBuffer = await sharp(file.buffer)
+        .resize({
+            width: 1024,
+            height: 1024,
+            fit: "inside",
+            withoutEnlargement: true,
+        })
+        .webp({
+            quality: 80,
+        })
+        .toBuffer();
 
-    await fs.writeFile(filepath, file.buffer);
+    await fs.writeFile(filepath, optimizedBuffer);
 
     return {
-      filename,
-      url: this.buildFileUrl(folder, filename),
+        filename,
+        url: this.buildFileUrl(folder, filename),
     };
   }
 
