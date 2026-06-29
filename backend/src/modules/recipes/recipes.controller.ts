@@ -39,7 +39,8 @@ export class RecipesController {
       const recipe =
         await this.service.create(
           user.id,
-          data
+          data,
+          req.file,
         );
 
       return res
@@ -130,7 +131,8 @@ export class RecipesController {
           id,
           user.id,
           user.role,
-          data
+          data,
+          req.file,
         );
 
       return res.json(recipe);

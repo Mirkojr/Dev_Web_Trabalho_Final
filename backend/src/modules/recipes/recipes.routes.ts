@@ -689,6 +689,7 @@ router.post(
 router.patch(
   "/:id",
   authMiddleware,
+  uploadRecipeImage,
   controller.update
 );
 
