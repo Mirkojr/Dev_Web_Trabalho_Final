@@ -9,7 +9,9 @@ type SwipeAreaProps = {
 	loading?: boolean;
 	error?: string | null;
 	empty?: boolean;
+	emptyMessage?: string;
 	disabled?: boolean;
+	filterCount?: number;
 	onPass?: () => void;
 	onSmash?: () => void;
 	onFilter?: () => void;
@@ -20,7 +22,9 @@ export default function SwipeArea({
 	loading,
 	error,
 	empty,
+	emptyMessage = "Acabaram as receitas por aqui! Volte mais tarde. 🍽️",
 	disabled,
+	filterCount = 0,
 	onPass,
 	onSmash,
 	onFilter,
@@ -28,7 +32,7 @@ export default function SwipeArea({
 	return (
 		<div className={styles.area}>
 			<div className={styles.topbar}>
-				<FilterButton onClick={onFilter} />
+				<FilterButton onClick={onFilter} count={filterCount} />
 			</div>
 
 			<div className={styles.stage}>
@@ -37,9 +41,7 @@ export default function SwipeArea({
 				) : error ? (
 					<div className={styles.state}>{error}</div>
 				) : empty || !recipe ? (
-					<div className={styles.state}>
-						Acabaram as receitas por aqui! Volte mais tarde. 🍽️
-					</div>
+					<div className={styles.state}>{emptyMessage}</div>
 				) : (
 					<div className={styles.card}>
 						<RecipeCard
