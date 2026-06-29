@@ -39,11 +39,11 @@ const controller = new UsersController();
  *                 example: https://cdn.example.com/avatars/artur.png
  *     responses:
  *       200:
- *         description: Perfil atualizado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
+ *        description: Perfil atualizado com sucesso
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
  *               properties:
  *                 id:
  *                   type: string
@@ -61,14 +61,14 @@ const controller = new UsersController();
  *                 bio:
  *                   type: string
  *                   nullable: true
- *             example:
- *               id: cm1q2w3e4r5t6y7u8i9o0p
- *               name: Artur Silva
- *               username: artur_silva
- *               email: artur@example.com
- *               role: USER
- *               avatarUrl: https://cdn.example.com/avatars/artur.png
- *               bio: Desenvolvedor apaixonado por produto e UI.
+ *              example:
+ *                id: cm1q2w3e4r5t6y7u8i9o0p
+ *                name: Arthur Nunes
+ *                username: arthur_nunes
+ *                email: arthur@example.com
+ *                role: USER
+ *                avatarUrl: /uploads/avatars/8f73c4b8.webp
+ *                bio: Desenvolvedor Full Stack apaixonado pelo produto.
  *       401:
  *         description: Token ausente ou inválido
  *       404:
@@ -360,7 +360,7 @@ router.get(
  *               avatar:
  *                 type: string
  *                 format: binary
- *                 description: Imagem do novo avatar do usuário
+ *                 description: Arquivo de imagem (JPEG, PNG ou WebP) que será utilizado como novo avatar do usuário.
  *     responses:
  *       200:
  *         description: Avatar atualizado com sucesso
