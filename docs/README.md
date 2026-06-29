@@ -133,15 +133,7 @@ Caso exista divergência entre documentos, deve-se seguir a ordem acima.
 ## Tecnologias Relacionadas
 
 ### Backend
-
-- Node.js
-- TypeScript
-- Express
-- Prisma ORM
-- PostgreSQL
-- JWT
-- Bcrypt
-- Swagger / OpenAPI
+As tecnologias utilizadas pelo backend podem ser encontradas [este documento](backend-technologies.md)
 
 ### Frontend
 
