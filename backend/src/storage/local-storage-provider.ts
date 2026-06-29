@@ -17,6 +17,27 @@ import type {
 } from "./types";
 
 export class LocalStorageProvider implements StorageProvider {
+  private async processImage(buffer: Buffer): Promise<Buffer> {
+    return sharp(buffer)
+        .resize({
+        width: 1024,
+        height: 1024,
+        fit: "inside",
+        withoutEnlargement: true,
+        })
+        .webp({
+        quality: 80,
+        })
+        .toBuffer();
+  }
+
+  private async writeFile(
+    filepath: string,
+    buffer: Buffer,
+    ): Promise<void> {
+    await fs.writeFile(filepath, buffer);
+  }
+
   async save(
     file: UploadFile,
     folder: UploadFolder,
@@ -24,21 +45,10 @@ export class LocalStorageProvider implements StorageProvider {
     const filename = this.buildFilename();
 
     const filepath = this.resolveFilePath(folder, filename);
-    
-    // Processamento da imagem usando Sharp
-    const optimizedBuffer = await sharp(file.buffer)
-        .resize({
-            width: 1024,
-            height: 1024,
-            fit: "inside",
-            withoutEnlargement: true,
-        })
-        .webp({
-            quality: 80,
-        })
-        .toBuffer();
 
-    await fs.writeFile(filepath, optimizedBuffer);
+    const buffer = await this.processImage(file.buffer);
+
+    await this.writeFile(filepath, buffer);
 
     return {
         filename,
