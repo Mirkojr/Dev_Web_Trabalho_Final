@@ -31,7 +31,11 @@ type ApiRecipe = {
 	ingredients?: Array<{
 		quantity?: number;
 		unit?: string;
-		ingredient?: { id: string; name: string };
+		ingredient?: {
+			id: string;
+			name: string;
+			allergens?: Array<{ allergen?: { id: string; name: string } }>;
+		};
 	}>;
 };
 
@@ -46,6 +50,18 @@ function buildIngredientLabel(item: ApiRecipe["ingredients"][number]): string {
 	const unit = item.unit ?? "";
 	const name = item.ingredient?.name ?? "";
 	return `${quantity} ${unit} de ${name}`.replace(/\s+/g, " ").trim();
+}
+
+/** Junta (sem repetir) os alérgenos de todos os ingredientes da receita. */
+function collectAllergens(ingredients: ApiRecipe["ingredients"]): string[] {
+	const set = new Set<string>();
+	(ingredients ?? []).forEach((item) => {
+		(item.ingredient?.allergens ?? []).forEach((link) => {
+			const name = link.allergen?.name;
+			if (name) set.add(name);
+		});
+	});
+	return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
 export function mapRecipe(recipe: ApiRecipe): RecipeView {
@@ -66,6 +82,7 @@ export function mapRecipe(recipe: ApiRecipe): RecipeView {
 			.map((entry) => entry.category?.name)
 			.filter((name): name is string => Boolean(name)),
 		ingredients: (recipe.ingredients ?? []).map(buildIngredientLabel),
+		allergens: collectAllergens(recipe.ingredients),
 		authorName: recipe.author?.username ?? "",
 	};
 }

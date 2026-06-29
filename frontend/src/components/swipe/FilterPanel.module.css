@@ -1,0 +1,154 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: rgba(20, 18, 24, 0.45);
+}
+
+.panel {
+	width: 100%;
+	max-width: 420px;
+	max-height: 85dvh;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 20px;
+	padding: 22px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+	box-sizing: border-box;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #1a1a1a;
+	margin: 0;
+}
+
+.close {
+	border: none;
+	background: none;
+	font-size: 1.6rem;
+	line-height: 1;
+	color: #6b6b6b;
+	cursor: pointer;
+}
+
+.section {
+	margin-top: 18px;
+}
+
+.sectionTitle {
+	font-size: 0.78rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #8a8a93;
+	margin: 0 0 10px;
+}
+
+.note {
+	font-size: 0.8rem;
+	color: #9a9aa5;
+	margin: -4px 0 10px;
+}
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.chip {
+	border: 1px solid #e3e3e6;
+	background: #fff;
+	border-radius: 999px;
+	padding: 8px 14px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #3a3a46;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover {
+	border-color: #f87a5d;
+}
+
+.chipActive {
+	background: #f87a5d;
+	border-color: #f87a5d;
+	color: #fff;
+}
+
+.chipBlock {
+	border: 1px solid #e3e3e6;
+	background: #fff;
+	border-radius: 999px;
+	padding: 8px 14px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #3a3a46;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.chipBlock:hover {
+	border-color: #e8556d;
+}
+
+.chipBlockActive {
+	background: #e8556d;
+	border-color: #e8556d;
+	color: #fff;
+}
+
+.empty {
+	font-size: 0.85rem;
+	color: #9a9aa5;
+	margin: 0;
+}
+
+.footer {
+	display: flex;
+	gap: 12px;
+	margin-top: 26px;
+}
+
+.clear {
+	flex: 1;
+	border: 1px solid #e3e3e6;
+	background: #fff;
+	border-radius: 12px;
+	padding: 12px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	color: #3a3a46;
+	cursor: pointer;
+}
+
+.apply {
+	flex: 2;
+	border: none;
+	background: #f87a5d;
+	border-radius: 12px;
+	padding: 12px;
+	font-size: 0.92rem;
+	font-weight: 700;
+	color: #fff;
+	cursor: pointer;
+}
+
+.apply:hover {
+	background: #f56a4a;
+}
