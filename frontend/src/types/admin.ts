@@ -12,3 +12,39 @@ export interface DashboardMetrics {
   smashes: number;
   passes: number;
 }
+
+export type ModerationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type Difficulty = "EASY" | "MEDIUM" | "HARD";
+
+export interface AdminRecipeAuthor {
+  id: string;
+  username: string;
+  avatarUrl?: string | null;
+}
+
+export interface AdminRecipe {
+  id: string;
+  title: string;
+  description: string;
+  preparationMethod: string;
+  preparationTimeMinutes: number;
+  difficulty: Difficulty;
+  imageUrl?: string | null;
+  status: ModerationStatus;
+  authorId: string;
+  createdAt: string;
+  // Presente em GET /recipes (aprovadas); ausente em GET /moderation/pending.
+  author?: AdminRecipeAuthor;
+}
+
+export interface AdminCatalogItem {
+  id: string;
+  name: string;
+  status: ModerationStatus;
+}
+
+export interface PendingModerationResult {
+  recipes: AdminRecipe[];
+  categories: AdminCatalogItem[];
+  ingredients: AdminCatalogItem[];
+}
