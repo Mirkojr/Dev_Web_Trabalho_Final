@@ -8,6 +8,7 @@ import {
 import {
   authMiddleware,
 } from "../../middlewares/auth.middleware";
+import { uploadRecipeImage } from "../../middlewares/upload.middleware";
 
 const router = Router();
 
@@ -517,6 +518,7 @@ router.get(
 router.post(
   "/",
   authMiddleware,
+  uploadRecipeImage,
   controller.create
 );
 

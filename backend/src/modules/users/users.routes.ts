@@ -3,6 +3,7 @@ import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 
 import { UsersController } from "./users.controller";
+import { uploadAvatar } from "../../middlewares/upload.middleware";
 
 const router = Router();
 
@@ -336,6 +337,66 @@ router.get(
   '/me/smashs',
   authMiddleware,
   controller.getSmashs
+);
+
+/**
+ * @openapi
+ * /users/me/avatar:
+ *   patch:
+ *     tags:
+ *       - Users
+ *     summary: Atualizar avatar do usuário autenticado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - avatar
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: Imagem do novo avatar do usuário
+ *     responses:
+ *       200:
+ *         description: Avatar atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 avatarUrl:
+ *                   type: string
+ *                   nullable: true
+ *                 bio:
+ *                   type: string
+ *                   nullable: true
+ *       400:
+ *         description: Arquivo inválido ou não enviado
+ *       401:
+ *         description: Não autenticado
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.patch(
+    "/me/avatar",
+    authMiddleware,
+    uploadAvatar,
+    controller.updateAvatar,
 );
 
 export default router;
