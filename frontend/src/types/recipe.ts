@@ -1,4 +1,3 @@
-
 export type Difficulty = "EASY" | "MEDIUM" | "HARD";
 export type InteractionType = "SMASH" | "PASS";
 
@@ -20,13 +19,28 @@ export type ApiDietPreferenceLink = {
 	dietPreference: { id: string; name: string };
 };
 
+export type ApiAllergen = {
+	id: string;
+	name: string;
+};
+
+export type ApiIngredientAllergenLink = {
+	ingredientId: string;
+	allergenId: string;
+	allergen: ApiAllergen;
+};
+
 export type ApiIngredientLink = {
 	id: string;
 	recipeId: string;
 	ingredientId: string;
 	quantity: number;
 	unit: string;
-	ingredient: { id: string; name: string };
+	ingredient: {
+		id: string;
+		name: string;
+		allergens?: ApiIngredientAllergenLink[];
+	};
 };
 
 export type ApiComment = {
@@ -77,7 +91,14 @@ export type RecipeView = {
 	timeLabel: string;
 	tags: string[];
 	ingredients: string[];
+	allergens: string[];
 	authorName: string;
+};
+
+// ===== Alérgenos (catálogo + perfil do usuário) =====
+export type Allergen = {
+	id: string;
+	name: string;
 };
 
 // ===== Catálogo + payloads de escrita (Telas 10/11) =====

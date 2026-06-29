@@ -6,12 +6,14 @@ import styles from "./FilterPanel.module.css";
 export type SwipeFilters = {
 	difficulties: string[];
 	categories: string[];
+	allergens: string[]; // alérgenos a ESCONDER nesta sessão
 };
 
 type FilterPanelProps = {
 	open: boolean;
 	difficultyOptions: string[];
 	categoryOptions: string[];
+	allergenOptions: string[];
 	value: SwipeFilters;
 	onApply: (filters: SwipeFilters) => void;
 	onClose: () => void;
@@ -21,6 +23,7 @@ export default function FilterPanel({
 	open,
 	difficultyOptions,
 	categoryOptions,
+	allergenOptions,
 	value,
 	onApply,
 	onClose,
@@ -54,8 +57,15 @@ export default function FilterPanel({
 		}));
 	}
 
+	function toggleAllergen(item: string) {
+		setDraft((prev) => ({
+			...prev,
+			allergens: toggle(prev.allergens, item),
+		}));
+	}
+
 	function clearAll() {
-		setDraft({ difficulties: [], categories: [] });
+		setDraft({ difficulties: [], categories: [], allergens: [] });
 	}
 
 	return (
@@ -116,6 +126,33 @@ export default function FilterPanel({
 										draft.categories.includes(option) ? styles.chipActive : ""
 									}`}
 									onClick={() => toggleCategory(option)}
+								>
+									{option}
+								</button>
+							))}
+						</div>
+					)}
+				</section>
+
+				<section className={styles.section}>
+					<h3 className={styles.sectionTitle}>Esconder receitas com</h3>
+					<p className={styles.note}>
+						Receitas que contêm estes alérgenos não serão exibidas nesta sessão.
+					</p>
+					{allergenOptions.length === 0 ? (
+						<p className={styles.empty}>Nenhum alérgeno cadastrado.</p>
+					) : (
+						<div className={styles.chips}>
+							{allergenOptions.map((option) => (
+								<button
+									key={option}
+									type="button"
+									className={`${styles.chipBlock} ${
+										draft.allergens.includes(option)
+											? styles.chipBlockActive
+											: ""
+									}`}
+									onClick={() => toggleAllergen(option)}
 								>
 									{option}
 								</button>

@@ -57,6 +57,12 @@
 	margin: 0 0 10px;
 }
 
+.note {
+	font-size: 0.8rem;
+	color: #9a9aa5;
+	margin: -4px 0 10px;
+}
+
 .chips {
 	display: flex;
 	flex-wrap: wrap;
@@ -82,6 +88,28 @@
 .chipActive {
 	background: #f87a5d;
 	border-color: #f87a5d;
+	color: #fff;
+}
+
+.chipBlock {
+	border: 1px solid #e3e3e6;
+	background: #fff;
+	border-radius: 999px;
+	padding: 8px 14px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #3a3a46;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.chipBlock:hover {
+	border-color: #e8556d;
+}
+
+.chipBlockActive {
+	background: #e8556d;
+	border-color: #e8556d;
 	color: #fff;
 }
 

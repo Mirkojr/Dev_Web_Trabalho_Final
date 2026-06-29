@@ -9,13 +9,18 @@ import FilterPanel, { SwipeFilters } from "@/components/swipe/FilterPanel";
 import { recipeService } from "@/services/recipe.service";
 import { commentService } from "@/services/comment.service";
 import { catalogService } from "@/services/catalog.service";
+import { allergenService } from "@/services/allergen.service";
 import { getToken } from "@/services/api";
 import { InteractionType, RecipeComment, RecipeView } from "@/types/recipe";
 import styles from "./swipe.module.css";
 
 // Dificuldades são um enum fixo — sempre aparecem no filtro
 const DIFFICULTY_OPTIONS = ["Fácil", "Médio", "Difícil"];
-const EMPTY_FILTERS: SwipeFilters = { difficulties: [], categories: [] };
+const EMPTY_FILTERS: SwipeFilters = {
+	difficulties: [],
+	categories: [],
+	allergens: [],
+};
 
 export default function SwipePage() {
 	const router = useRouter();
@@ -32,8 +37,9 @@ export default function SwipePage() {
 	const [filters, setFilters] = useState<SwipeFilters>(EMPTY_FILTERS);
 	const [showFilters, setShowFilters] = useState(false);
 
-	// Lista FIXA de categorias (todas as cadastradas), independente do feed
+	// Listas FIXAS do catálogo (independem do feed)
 	const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+	const [allergenOptions, setAllergenOptions] = useState<string[]>([]);
 
 	// Deck após remover já interagidas e aplicar filtros (client-side)
 	const filteredRecipes = useMemo(() => {
@@ -48,12 +54,20 @@ export default function SwipePage() {
 				filters.categories.length === 0 ||
 				recipe.tags.some((tag) => filters.categories.includes(tag));
 
-			return difficultyOk && categoryOk;
+			// Alérgenos: ESCONDE receitas que contenham qualquer um dos selecionados
+			const allergenOk =
+				filters.allergens.length === 0 ||
+				!recipe.allergens.some((a) => filters.allergens.includes(a));
+
+			return difficultyOk && categoryOk && allergenOk;
 		});
 	}, [recipes, filters, swipedIds]);
 
 	const current = filteredRecipes[0];
-	const filterCount = filters.difficulties.length + filters.categories.length;
+	const filterCount =
+		filters.difficulties.length +
+		filters.categories.length +
+		filters.allergens.length;
 
 	// 1) Feed (exige login)
 	useEffect(() => {
@@ -89,7 +103,7 @@ export default function SwipePage() {
 		};
 	}, [router]);
 
-	// 2) Categorias fixas do catálogo (carregadas uma vez, não dependem do feed)
+	// 2) Catálogos fixos: categorias e alérgenos
 	useEffect(() => {
 		if (!getToken()) return;
 
@@ -107,7 +121,16 @@ export default function SwipePage() {
 				}
 			})
 			.catch(() => {
-				/* mantém a lista vazia se o catálogo falhar */
+				/* mantém vazio se falhar */
+			});
+
+		allergenService
+			.getAll()
+			.then((items) => {
+				if (active) setAllergenOptions(items.map((item) => item.name));
+			})
+			.catch(() => {
+				/* mantém vazio se falhar */
 			});
 
 		return () => {
@@ -203,6 +226,7 @@ export default function SwipePage() {
 				open={showFilters}
 				difficultyOptions={DIFFICULTY_OPTIONS}
 				categoryOptions={categoryOptions}
+				allergenOptions={allergenOptions}
 				value={filters}
 				onApply={handleApplyFilters}
 				onClose={() => setShowFilters(false)}

@@ -98,6 +98,52 @@
 	border-color: #f87a5d;
 }
 
+.allergens {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.helper {
+	margin: 0;
+	font-size: 0.82rem;
+	color: #9a9aa5;
+}
+
+.allergenChips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.allergenChip {
+	border: 1px solid #e3e3e6;
+	background: #fff;
+	border-radius: 999px;
+	padding: 8px 14px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #3a3a46;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.allergenChip:hover {
+	border-color: #e8556d;
+}
+
+.allergenChipActive {
+	background: #e8556d;
+	border-color: #e8556d;
+	color: #fff;
+}
+
+.allergenChip:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
 .error {
 	margin: 0;
 	padding: 10px 12px;

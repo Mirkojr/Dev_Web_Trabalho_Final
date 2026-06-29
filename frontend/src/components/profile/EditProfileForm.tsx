@@ -4,7 +4,9 @@ import { useEffect, useState, type SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import { userService } from "@/services/user.service";
+import { allergenService } from "@/services/allergen.service";
 import type { AuthUser } from "@/types/auth";
+import type { Allergen } from "@/types/recipe";
 import styles from "./EditProfileForm.module.css";
 
 const GENDER_OPTIONS = ["Feminino", "Masculino", "Outro", "Prefiro não dizer"];
@@ -27,6 +29,16 @@ export default function EditProfileForm() {
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	// Alergias e intolerâncias
+	const [allAllergens, setAllAllergens] = useState<Allergen[]>([]);
+	const [myAllergenIds, setMyAllergenIds] = useState<Set<string>>(
+		() => new Set()
+	);
+	const [allergenBusy, setAllergenBusy] = useState<Set<string>>(
+		() => new Set()
+	);
+	const [allergenError, setAllergenError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let active = true;
@@ -62,6 +74,59 @@ export default function EditProfileForm() {
 			active = false;
 		};
 	}, []);
+
+	// Carrega catálogo de alérgenos + os que já estão no perfil
+	useEffect(() => {
+		let active = true;
+
+		Promise.all([allergenService.getAll(), allergenService.getMine()])
+			.then(([all, mine]) => {
+				if (!active) return;
+				setAllAllergens(all);
+				setMyAllergenIds(new Set(mine.map((a) => a.id)));
+			})
+			.catch(() => {
+				/* alergias são opcionais: falha silenciosa */
+			});
+
+		return () => {
+			active = false;
+		};
+	}, []);
+
+	async function toggleAllergen(id: string) {
+		if (allergenBusy.has(id)) return;
+		const isActive = myAllergenIds.has(id);
+
+		setAllergenBusy((prev) => new Set(prev).add(id));
+		setAllergenError(null);
+
+		try {
+			if (isActive) {
+				await allergenService.remove(id);
+				setMyAllergenIds((prev) => {
+					const next = new Set(prev);
+					next.delete(id);
+					return next;
+				});
+			} else {
+				await allergenService.add(id);
+				setMyAllergenIds((prev) => new Set(prev).add(id));
+			}
+		} catch (err) {
+			setAllergenError(
+				err instanceof Error
+					? err.message
+					: "Não foi possível atualizar suas alergias."
+			);
+		} finally {
+			setAllergenBusy((prev) => {
+				const next = new Set(prev);
+				next.delete(id);
+				return next;
+			});
+		}
+	}
 
 	async function handleSubmit(event: SyntheticEvent) {
 		event.preventDefault();
@@ -191,6 +256,37 @@ export default function EditProfileForm() {
 					/>
 				</div>
 			</div>
+
+			<section className={styles.allergens}>
+				<p className={styles.label}>Alergias e intolerâncias</p>
+				<p className={styles.helper}>
+					Receitas que contêm esses ingredientes não aparecem no seu feed.
+				</p>
+				{allAllergens.length === 0 ? (
+					<p className={styles.helper}>Nenhum alérgeno cadastrado.</p>
+				) : (
+					<div className={styles.allergenChips}>
+						{allAllergens.map((item) => {
+							const active = myAllergenIds.has(item.id);
+							const busy = allergenBusy.has(item.id);
+							return (
+								<button
+									key={item.id}
+									type="button"
+									className={`${styles.allergenChip} ${
+										active ? styles.allergenChipActive : ""
+									}`}
+									onClick={() => toggleAllergen(item.id)}
+									disabled={busy}
+								>
+									{item.name}
+								</button>
+							);
+						})}
+					</div>
+				)}
+				{allergenError && <p className={styles.error}>{allergenError}</p>}
+			</section>
 
 			{error && <p className={styles.error}>{error}</p>}
 
