@@ -8,6 +8,8 @@
     "module": "commonjs",
     "moduleResolution": "Node",
 
+    "ignoreDeprecations": "6.0",
+    
     "strict": true,
 
     "esModuleInterop": true,
@@ -22,6 +24,6 @@
 
   },
 
-  "include": ["src", "tests", "prisma"],
+  "include": ["src", "tests", "prisma", "uploads"],
   "exclude": ["node_modules", "dist"]
 }
