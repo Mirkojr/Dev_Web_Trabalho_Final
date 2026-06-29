@@ -64,3 +64,20 @@ export function InteractionsIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function HomeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+    </Icon>
+  );
+}
+
+export function CommentsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 9 9 0 0 1-3.9-.9L3 21l1.4-4.2a8.4 8.4 0 0 1-1-4A8.4 8.4 0 0 1 12 4.5a8.4 8.4 0 0 1 9 7z" />
+    </Icon>
+  );
+}
