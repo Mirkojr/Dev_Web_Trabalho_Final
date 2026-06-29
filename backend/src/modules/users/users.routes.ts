@@ -28,15 +28,15 @@ const controller = new UsersController();
  *               name:
  *                 type: string
  *                 minLength: 3
- *                 example: Artur Silva
+ *                 example: Arthur Nunes
  *               bio:
  *                 type: string
  *                 maxLength: 500
- *                 example: Desenvolvedor apaixonado por produto e UI.
+ *                 example: Desenvolvedor Full Stack apaixonado pelo produto.
  *               avatarUrl:
  *                 type: string
  *                 format: uri
- *                 example: https://cdn.example.com/avatars/artur.png
+ *                 example: /uploads/avatars/seed/admin-avatar.webp
  *     responses:
  *       200:
  *        description: Perfil atualizado com sucesso
